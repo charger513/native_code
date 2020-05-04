@@ -30,9 +30,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
     try {
       final batteryLevel = await platform.invokeMethod('getBatteryLevel');
-      setState(() {
-        _batteryLevel = batteryLevel;
-      });
+      // setState(() {
+      //   _batteryLevel = batteryLevel;
+      // });
+
+      // await Future.delayed(Duration(seconds: 3));
+      _batteryLevel = batteryLevel;
+
+      // return Future.value(batteryLevel);
     } on PlatformException catch (error) {
       setState(() {
         _batteryLevel = null;
@@ -43,6 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _getBatteryLevel();
   }
 
   @override
@@ -51,8 +57,14 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('Native Code'),
       ),
-      body: Center(
-        child: Text('Battery Level: $_batteryLevel'),
+      body: FutureBuilder(
+        future: _getBatteryLevel(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          print(snapshot);
+          return snapshot.connectionState == ConnectionState.waiting ? Center(child: CircularProgressIndicator()) : Center(
+            child: Text('Battery Level: $_batteryLevel'),
+          );
+        },
       ),
     );
   }
